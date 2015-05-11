@@ -38,7 +38,7 @@ public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 		this.dotTexture = new Texture(Gdx.files.internal(Textures.DOT.getLocation()));
 		this.camera = new OrthographicCamera();
 		this.dots = new Array<Rectangle>();
-		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(Textures.FONT.getLocation()));
+		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(Textures.OPENSANS.getLocation()));
 		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
 		parameter.size = 16;
 		parameter.color = Color.BLACK;

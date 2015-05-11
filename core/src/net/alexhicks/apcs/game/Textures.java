@@ -3,7 +3,7 @@ package net.alexhicks.apcs.game;
 public enum Textures {
 
 	DOT("dot.png"),
-	FONT("OpenSans.ttf"),
+	OPENSANS("OpenSans.ttf"),
 	PLAYER("player.png");
 
 	private String file;

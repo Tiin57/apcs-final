@@ -16,23 +16,31 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.graphics.Color;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 
 	// Do not use ArrayList or HashMap, use Array<> or other GDX classes
 	// Garbage collection makes life better.
+	public static final boolean DEBUG = false;
+	public static final float ACCELERATION_CONSTANT = 0.1f;
 	private static final int MOVEMENT_CONSTANT = 4;
+	private static final int DOT_TIME = 100000 * 10000 * 2;
+	public static List<TimeCoord> coords = new ArrayList<TimeCoord>();
 	private OrthographicCamera camera;
 	private SpriteBatch batch;
 	private Texture playerTexture, dotTexture;
-	private Rectangle player;
+	private AccelRectangle player;
 	private Array<Rectangle> dots;
 	private BitmapFont font;
 	private long lastDotTime;
 	private int score = 0;
+	private long startTime;
 
 	@Override
 	public void create() {
+		this.startTime = TimeUtils.millis();
 		this.batch = new SpriteBatch();
 		this.playerTexture = new Texture(Gdx.files.internal(Textures.PLAYER.getLocation()));
 		this.dotTexture = new Texture(Gdx.files.internal(Textures.DOT.getLocation()));
@@ -45,7 +53,7 @@ public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 		this.font = generator.generateFont(parameter);
 		generator.dispose();
 		camera.setToOrtho(false, 800, 480);
-		this.player = new Rectangle();
+		this.player = new AccelRectangle();
 		player.width = playerTexture.getWidth();
 		player.height = playerTexture.getHeight();
 		player.x = (camera.viewportWidth / 2) - (player.width / 2);
@@ -64,34 +72,45 @@ public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 			batch.draw(dotTexture, dot.x, dot.y);
 		}
 		font.draw(batch, "Score: " + score, 30, 30);
+		if (DEBUG) {
+			font.draw(batch, "Vertical: " + player.verticalAcceleration, 30, 60);
+			font.draw(batch, "Horizontal: " + player.horizontalAcceleration, 30, 90);
+		}
 		batch.end();
 		update();
 		checkBoundaries(player);
+		/*
 		for (Rectangle dot : dots) {
 			checkBoundaries(dot);
 		}
+		*/
 	}
 
 	private void update() {
+		player.decelerate();
 		if (Gdx.input.isKeyPressed(Keys.LEFT) || Gdx.input.isKeyPressed(Keys.A)) {
-			player.x -= MOVEMENT_CONSTANT;
+			player.accelerate(Direction.LEFT);
 		}
 		if (Gdx.input.isKeyPressed(Keys.RIGHT) || Gdx.input.isKeyPressed(Keys.D)) {
-			player.x += MOVEMENT_CONSTANT;
+			player.accelerate(Direction.RIGHT);
 		}
 		if (Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.W)) {
-			player.y += MOVEMENT_CONSTANT;
+			player.accelerate(Direction.UP);
 		}
 		if (Gdx.input.isKeyPressed(Keys.DOWN) || Gdx.input.isKeyPressed(Keys.S)) {
-			player.y -= MOVEMENT_CONSTANT;
+			player.accelerate(Direction.DOWN);
 		}
-		if (TimeUtils.nanoTime() - lastDotTime > 100000 * 10000) {
+		player.move();
+		coords.add(new TimeCoord(player.x, player.y, TimeUtils.timeSinceMillis(startTime)));
+		if (TimeUtils.nanoTime() - lastDotTime > DOT_TIME) {
 			spawnDot();
 		}
 		for (int i = 0; i < dots.size; i++) {
 			Rectangle dot = dots.get(i);
+			/*
 			dot.y += MathUtils.randomSign() * MOVEMENT_CONSTANT;
 			dot.x += MathUtils.randomSign() * MOVEMENT_CONSTANT;
+			*/
 			if (dot.overlaps(player)) {
 				dots.removeIndex(i);
 				score++;

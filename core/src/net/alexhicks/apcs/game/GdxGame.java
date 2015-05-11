@@ -22,7 +22,6 @@ public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 	// Do not use ArrayList or HashMap, use Array<> or other GDX classes
 	// Garbage collection makes life better.
 	private static final int MOVEMENT_CONSTANT = 4;
-	private static final String FONT_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][_!$%#@|\\/?-+=()*&.;,{}\"´`'<>";
 	private OrthographicCamera camera;
 	private SpriteBatch batch;
 	private Texture playerTexture, dotTexture;
@@ -41,11 +40,11 @@ public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 		this.dots = new Array<Rectangle>();
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(Textures.FONT.getLocation()));
 		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
-		parameter.size = 12;
+		parameter.size = 16;
 		parameter.color = Color.BLACK;
 		this.font = generator.generateFont(parameter);
 		generator.dispose();
-		camera.setToOrtho(true, 800, 480);
+		camera.setToOrtho(false, 800, 480);
 		this.player = new Rectangle();
 		player.width = playerTexture.getWidth();
 		player.height = playerTexture.getHeight();
@@ -64,7 +63,7 @@ public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 		for (Rectangle dot : dots) {
 			batch.draw(dotTexture, dot.x, dot.y);
 		}
-		font.draw(batch, "Score: " + score, 0, 0);
+		font.draw(batch, "Score: " + score, 30, 30);
 		batch.end();
 		update();
 		checkBoundaries(player);
@@ -81,10 +80,10 @@ public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 			player.x += MOVEMENT_CONSTANT;
 		}
 		if (Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.W)) {
-			player.y -= MOVEMENT_CONSTANT;
+			player.y += MOVEMENT_CONSTANT;
 		}
 		if (Gdx.input.isKeyPressed(Keys.DOWN) || Gdx.input.isKeyPressed(Keys.S)) {
-			player.y += MOVEMENT_CONSTANT;
+			player.y -= MOVEMENT_CONSTANT;
 		}
 		if (TimeUtils.nanoTime() - lastDotTime > 100000 * 10000) {
 			spawnDot();

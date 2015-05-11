@@ -3,7 +3,8 @@ package net.alexhicks.apcs.game;
 import com.badlogic.gdx.math.Rectangle;
 
 public class AccelRectangle extends Rectangle {
-
+	
+	public static final float ACCELERATION_CONSTANT = 0.5f;
 	public float verticalAcceleration = 0.0f;
 	public float horizontalAcceleration = 0.0f;
 
@@ -15,16 +16,16 @@ public class AccelRectangle extends Rectangle {
 	public void accelerate(Direction d) {
 		switch (d) {
 			case UP:
-				this.verticalAcceleration += GdxGame.ACCELERATION_CONSTANT;
+				this.verticalAcceleration += ACCELERATION_CONSTANT;
 				break;
 			case DOWN:
-				this.verticalAcceleration -= GdxGame.ACCELERATION_CONSTANT;
+				this.verticalAcceleration -= ACCELERATION_CONSTANT;
 				break;
 			case LEFT:
-				this.horizontalAcceleration -= GdxGame.ACCELERATION_CONSTANT;
+				this.horizontalAcceleration -= ACCELERATION_CONSTANT;
 				break;
 			case RIGHT:
-				this.horizontalAcceleration += GdxGame.ACCELERATION_CONSTANT;
+				this.horizontalAcceleration += ACCELERATION_CONSTANT;
 				break;
 		}
 	}
@@ -35,6 +36,6 @@ public class AccelRectangle extends Rectangle {
 	}
 
 	private float calculateDeceleration(float f) {
-		return f > 0 ? f - (GdxGame.ACCELERATION_CONSTANT / 2) : f == 0 ? 0 : f + (GdxGame.ACCELERATION_CONSTANT / 2);
+		return f > 0 ? f - (ACCELERATION_CONSTANT / 2) : f == 0 ? 0 : f + (ACCELERATION_CONSTANT / 2);
 	}
 }

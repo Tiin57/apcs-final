@@ -4,9 +4,10 @@ public enum Textures {
 
 	DOT("dot.png"),
 	OPENSANS("OpenSans.ttf"),
-	PLAYER("player.png");
+	PLAYER("player.png"),
+	TRAIL("trail.png");
 
-	private String file;
+	private final String file;
 
 	Textures(String file) {
 		this.file = file;

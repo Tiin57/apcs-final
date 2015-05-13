@@ -38,7 +38,7 @@ public class GameServer {
 			}
 		}
 	}
-	
+
 	public void broadcast(String data) {
 		for (GameClient c : clients) {
 			c.send(data);

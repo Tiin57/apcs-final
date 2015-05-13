@@ -16,7 +16,6 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +24,6 @@ public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 	// Do not use ArrayList or HashMap, use Array<> or other GDX classes
 	// Garbage collection makes life better.
 	public static final boolean DEBUG = false;
-	private static final int MOVEMENT_CONSTANT = 4;
 	private static final int DOT_TIME = 100000 * 10000 * 2;
 	public static List<TimeCoord> coords = new ArrayList<TimeCoord>();
 	private OrthographicCamera camera;
@@ -85,11 +83,6 @@ public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 		batch.end();
 		update();
 		checkBoundaries(player);
-		/*
-		for (Rectangle dot : dots) {
-			checkBoundaries(dot);
-		}
-		*/
 	}
 
 	private void update() {
@@ -114,16 +107,12 @@ public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 		if (trail.size() == 50) {
 			trail.remove(0);
 		}
-		trail.add(new Float[] {
+		trail.add(new Float[]{
 			player.x + (player.width / 2) - (trailTexture.getWidth() / 2),
 			player.y + (player.height / 2) - (trailTexture.getHeight() / 2)
 		});
 		for (int i = 0; i < dots.size; i++) {
 			Rectangle dot = dots.get(i);
-			/*
-			dot.y += MathUtils.randomSign() * MOVEMENT_CONSTANT;
-			dot.x += MathUtils.randomSign() * MOVEMENT_CONSTANT;
-			*/
 			if (dot.overlaps(player)) {
 				dots.removeIndex(i);
 				score++;

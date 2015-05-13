@@ -3,7 +3,7 @@ package net.alexhicks.apcs.game;
 import com.badlogic.gdx.math.Rectangle;
 
 public class AccelRectangle extends Rectangle {
-	
+
 	public static final float ACCELERATION_CONSTANT = 0.5f;
 	public float verticalAcceleration = 0.0f;
 	public float horizontalAcceleration = 0.0f;
@@ -12,7 +12,7 @@ public class AccelRectangle extends Rectangle {
 		this.x += horizontalAcceleration;
 		this.y += verticalAcceleration;
 	}
-	
+
 	public void accelerate(Direction d) {
 		switch (d) {
 			case UP:
@@ -29,7 +29,7 @@ public class AccelRectangle extends Rectangle {
 				break;
 		}
 	}
-	
+
 	public void decelerate() {
 		this.verticalAcceleration = calculateDeceleration(verticalAcceleration);
 		this.horizontalAcceleration = calculateDeceleration(horizontalAcceleration);

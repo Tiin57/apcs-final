@@ -44,18 +44,6 @@ project(":desktop") {
     }
 }
 
-project(":server") {
-	apply plugin: "java"
-	
-	
-	dependencies {
-		compile project(":core")
-		compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-		compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-		compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
-	}
-}
-
 project(":core") {
     apply plugin: "java"
 

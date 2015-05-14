@@ -16,8 +16,6 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.graphics.Color;
-import java.util.ArrayList;
-import java.util.List;
 
 public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 
@@ -25,17 +23,17 @@ public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 	// Garbage collection makes life better.
 	public static final boolean DEBUG = false;
 	private static final int DOT_TIME = 100000 * 10000 * 2;
-	public static List<TimeCoord> coords = new ArrayList<TimeCoord>();
-	private OrthographicCamera camera;
-	private SpriteBatch batch;
-	private Texture playerTexture, dotTexture, trailTexture;
-	private AccelRectangle player;
-	private Array<AccelRectangle> dots;
-	private BitmapFont font;
+	public static Array<TimeCoord> coords = new Array<TimeCoord>();
+	public OrthographicCamera camera;
+	public SpriteBatch batch;
+	public Texture playerTexture, dotTexture, trailTexture;
+	public AccelRectangle player;
+	public Array<AccelRectangle> dots;
+	public BitmapFont font;
 	private long lastDotTime;
-	private int score = 0;
-	private long startTime;
-	private List<Float[]> trail;
+	public int score = 0;
+	public long startTime;
+	public Array<Float[]> trail;
 
 	@Override
 	public void create() {
@@ -46,7 +44,7 @@ public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 		this.trailTexture = new Texture(Gdx.files.internal(Textures.TRAIL.getLocation()));
 		this.camera = new OrthographicCamera();
 		this.dots = new Array<AccelRectangle>();
-		this.trail = new ArrayList<Float[]>();
+		this.trail = new Array<Float[]>();
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(Textures.OPENSANS.getLocation()));
 		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
 		parameter.size = 16;
@@ -104,8 +102,8 @@ public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 		if (TimeUtils.nanoTime() - lastDotTime > DOT_TIME) {
 			spawnDot();
 		}
-		if (trail.size() == 50) {
-			trail.remove(0);
+		if (trail.size == 50) {
+			trail.removeIndex(0);
 		}
 		trail.add(new Float[]{
 			player.x + (player.width / 2) - (trailTexture.getWidth() / 2),

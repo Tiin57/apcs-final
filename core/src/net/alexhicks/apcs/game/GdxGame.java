@@ -2,7 +2,6 @@ package net.alexhicks.apcs.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.ApplicationListener;
-import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.files.FileHandle;
@@ -18,12 +17,6 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Path;
-import java.io.BufferedReader;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
 
 public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 
@@ -31,7 +24,7 @@ public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 	// Garbage collection makes life better.
 	public static final boolean DEBUG = false;
 	private static final int DOT_TIME = 100000 * 10000;
-	private static final int WINNING_SCORE = 10;
+	private static final int WINNING_SCORE = 30;
 	public static Array<TimeCoord> coords = new Array<TimeCoord>();
 	public OrthographicCamera camera;
 	public SpriteBatch batch;

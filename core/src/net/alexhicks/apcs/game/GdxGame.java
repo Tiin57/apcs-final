@@ -23,6 +23,7 @@ public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 	// Do not use ArrayList or HashMap, use Array<> or other GDX classes
 	// Garbage collection makes life better.
 	public static final boolean DEBUG = false;
+	public static final String VERSION = "1.0.0";
 	private static final int DOT_TIME = 100000 * 10000;
 	private static final int WINNING_SCORE = 30;
 	public static Array<TimeCoord> coords = new Array<TimeCoord>();

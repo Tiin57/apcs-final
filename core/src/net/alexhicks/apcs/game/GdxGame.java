@@ -2,8 +2,10 @@ package net.alexhicks.apcs.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.ApplicationListener;
+import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -16,13 +18,20 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Path;
+import java.io.BufferedReader;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 
 	// Do not use ArrayList or HashMap, use Array<> or other GDX classes
 	// Garbage collection makes life better.
 	public static final boolean DEBUG = false;
-	private static final int DOT_TIME = 100000 * 10000 * 2;
+	private static final int DOT_TIME = 100000 * 10000;
+	private static final int WINNING_SCORE = 10;
 	public static Array<TimeCoord> coords = new Array<TimeCoord>();
 	public OrthographicCamera camera;
 	public SpriteBatch batch;
@@ -31,8 +40,10 @@ public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 	public Array<AccelRectangle> dots;
 	public BitmapFont font;
 	private long lastDotTime;
+	private boolean isOver = false;
 	public int score = 0;
-	public long startTime;
+	public float highScore = 0.0f;
+	public long startTime, endTime;
 	public Array<Float[]> trail;
 
 	@Override
@@ -66,21 +77,29 @@ public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
-		batch.draw(playerTexture, player.x, player.y);
-		for (Rectangle dot : dots) {
-			batch.draw(dotTexture, dot.x, dot.y);
-		}
-		for (Float[] f : trail) {
-			batch.draw(trailTexture, f[0], f[1]);
-		}
-		font.draw(batch, "Score: " + score, 30, 30);
-		if (DEBUG) {
-			font.draw(batch, "Vertical: " + player.verticalAcceleration, 30, 60);
-			font.draw(batch, "Horizontal: " + player.horizontalAcceleration, 30, 90);
+		if (isOver) {
+			font.draw(batch, "Game Over!", camera.viewportWidth / 2, camera.viewportHeight / 2);
+			font.draw(batch, "Score: " + (generateScore() + "").substring(0, 4) + " dots per second", 30, 60);
+			font.draw(batch, "High Score: " + (highScore + "").substring(0, 4) + " dots per second", 30, 30);
+		} else {
+			batch.draw(playerTexture, player.x, player.y);
+			for (Rectangle dot : dots) {
+				batch.draw(dotTexture, dot.x, dot.y);
+			}
+			for (Float[] f : trail) {
+				batch.draw(trailTexture, f[0], f[1]);
+			}
+			font.draw(batch, "Score: " + score, 30, 30);
+			if (DEBUG) {
+				font.draw(batch, "Vertical: " + player.verticalAcceleration, 30, 90);
+				font.draw(batch, "Horizontal: " + player.horizontalAcceleration, 30, 120);
+			}
 		}
 		batch.end();
-		update();
-		checkBoundaries(player);
+		if (!isOver) {
+			update();
+			checkBoundaries();
+		}
 	}
 
 	private void update() {
@@ -116,31 +135,76 @@ public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 				score++;
 			}
 		}
+		if (score == WINNING_SCORE) {
+			gameOver();
+		}
 	}
 
-	private void checkBoundaries(AccelRectangle rect) {
-		if (rect.x < 0) {
-			rect.x = 0;
-			if (rect.horizontalAcceleration < 0) {
-				rect.horizontalAcceleration = 0;
+	private void checkBoundaries() {
+		if (player.x < 0) {
+			player.x = 0;
+			if (player.horizontalAcceleration < 0) {
+				player.horizontalAcceleration = 0;
 			}
-		} else if (rect.x > camera.viewportWidth - rect.width) {
-			rect.x = camera.viewportWidth - rect.width;
-			if (rect.horizontalAcceleration > 0) {
-				rect.horizontalAcceleration = 0;
-			}
-		}
-		if (rect.y < 0) {
-			rect.y = 0;
-			if (rect.verticalAcceleration < 0) {
-				rect.verticalAcceleration = 0;
-			}
-		} else if (rect.y > camera.viewportHeight - rect.height) {
-			rect.y = camera.viewportHeight - rect.height;
-			if (rect.verticalAcceleration > 0) {
-				rect.verticalAcceleration = 0;
+		} else if (player.x > camera.viewportWidth - player.width) {
+			player.x = camera.viewportWidth - player.width;
+			if (player.horizontalAcceleration > 0) {
+				player.horizontalAcceleration = 0;
 			}
 		}
+		if (player.y < 0) {
+			player.y = 0;
+			if (player.verticalAcceleration < 0) {
+				player.verticalAcceleration = 0;
+			}
+		} else if (player.y > camera.viewportHeight - player.height) {
+			player.y = camera.viewportHeight - player.height;
+			if (player.verticalAcceleration > 0) {
+				player.verticalAcceleration = 0;
+			}
+		}
+		/*for (int i = 25; i < trail.size; i++) {
+			Float[] f = trail.get(i);
+			float x = f[0];
+			float y = f[1];
+			if (x < player.x + player.width && x + trailTexture.getWidth() > player.x
+					&& y < player.y + player.height && y + trailTexture.getHeight() > player.y) {
+				gameOver();
+			}
+		}*/
+	}
+	
+	private float generateScore() {
+		return ((score + 0.0f) / (endTime - startTime) * 1000);
+	}
+	
+	private float saveHighScore() {
+		FileHandle saveFile = Gdx.files.local("highscore.txt");
+		System.out.println(saveFile.file().getAbsolutePath());
+		if (!saveFile.exists()) {
+			saveFile.write(false);
+		}
+		try {
+			String s = saveFile.readString();
+			float score = generateScore();
+			if (s != null && !s.equals("")) {
+				float f = Float.valueOf(s);
+				if (score < f) {
+					return f;
+				}
+			}
+			saveFile.writeString(score + "\n", false);
+			return score;
+		} catch (NumberFormatException ex) {
+			ex.printStackTrace();
+		}
+		return 0.0f;
+	}
+
+	private void gameOver() {
+		isOver = true;
+		endTime = TimeUtils.millis();
+		highScore = saveHighScore();
 	}
 
 	private void spawnDot() {

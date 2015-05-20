@@ -17,6 +17,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 
 public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 
@@ -25,7 +26,7 @@ public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 	public static final boolean DEBUG = false;
 	public static final String VERSION = "1.0.0";
 	private static final int DOT_TIME = 100000 * 10000;
-	private static final int WINNING_SCORE = 30;
+	private static final int WINNING_SCORE = 10;
 	public static Array<TimeCoord> coords = new Array<TimeCoord>();
 	public OrthographicCamera camera;
 	public SpriteBatch batch;
@@ -39,7 +40,9 @@ public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 	public float highScore = 0.0f;
 	public long startTime, endTime;
 	public Array<Float[]> trail;
-
+	private int dotCount = 0;
+	private GlyphLayout glyph;
+	
 	@Override
 	public void create() {
 		this.startTime = TimeUtils.millis();
@@ -50,6 +53,7 @@ public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 		this.camera = new OrthographicCamera();
 		this.dots = new Array<AccelRectangle>();
 		this.trail = new Array<Float[]>();
+		this.glyph = new GlyphLayout();
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(Textures.OPENSANS.getLocation()));
 		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
 		parameter.size = 16;
@@ -57,11 +61,7 @@ public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 		this.font = generator.generateFont(parameter);
 		generator.dispose();
 		camera.setToOrtho(false, 800, 480);
-		this.player = new AccelRectangle();
-		player.width = playerTexture.getWidth();
-		player.height = playerTexture.getHeight();
-		player.x = (camera.viewportWidth / 2) - (player.width / 2);
-		player.y = (camera.viewportHeight / 2) - (player.height / 2);
+		resetPlayer();
 		spawnDot();
 	}
 
@@ -72,9 +72,18 @@ public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 		if (isOver) {
-			font.draw(batch, "Game Over!", camera.viewportWidth / 2, camera.viewportHeight / 2);
-			font.draw(batch, "Score: " + (generateScore() + "").substring(0, 4) + " dots per second", 30, 60);
-			font.draw(batch, "High Score: " + (highScore + "").substring(0, 4) + " dots per second", 30, 30);
+			String x = "Game Over!";
+			glyph.setText(font, x);
+			font.draw(batch, x, (camera.viewportWidth / 2), (camera.viewportHeight / 2) - (glyph.height * 1));
+			x = "Press the spacebar or ENTER to restart!";
+			glyph.setText(font, x);
+			font.draw(batch, x, (camera.viewportWidth / 2), (camera.viewportHeight / 2) - (glyph.height * 3));
+			x = "Score: " + (generateScore() + "").substring(0, 4) + " dots per second";
+			glyph.setText(font, x);
+			font.draw(batch, x, (camera.viewportWidth / 2), (camera.viewportHeight / 2) + (glyph.height * 1));
+			x = "High Score: " + (highScore + "").substring(0, 4) + " dots per second";
+			glyph.setText(font, x);
+			font.draw(batch, x, (camera.viewportWidth / 2), (camera.viewportHeight / 2) + (glyph.height * 3));
 		} else {
 			batch.draw(playerTexture, player.x, player.y);
 			for (Rectangle dot : dots) {
@@ -83,16 +92,36 @@ public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 			for (Float[] f : trail) {
 				batch.draw(trailTexture, f[0], f[1]);
 			}
-			font.draw(batch, "Score: " + score, 30, 30);
+			font.draw(batch, "Score: " + score + " / " + WINNING_SCORE, 30, 30);
 			if (DEBUG) {
 				font.draw(batch, "Vertical: " + player.verticalAcceleration, 30, 90);
 				font.draw(batch, "Horizontal: " + player.horizontalAcceleration, 30, 120);
 			}
 		}
 		batch.end();
-		if (!isOver) {
+		if (isOver) {
+			updateOver();
+		} else {
 			update();
 			checkBoundaries();
+		}
+	}
+	
+	private void resetPlayer() {
+		this.player = new AccelRectangle();
+		player.width = playerTexture.getWidth();
+		player.height = playerTexture.getHeight();
+		player.x = (camera.viewportWidth / 2) - (player.width / 2);
+		player.y = (camera.viewportHeight / 2) - (player.height / 2);
+	}
+	
+	private void updateOver() {
+		if (Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isKeyPressed(Keys.ENTER)) {
+			score = 0;
+			isOver = false;
+			resetPlayer();
+			trail = new Array<Float[]>();
+			dotCount = 0;
 		}
 	}
 
@@ -202,6 +231,9 @@ public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 	}
 
 	private void spawnDot() {
+		if (dotCount == WINNING_SCORE) {
+			return;
+		}
 		AccelRectangle dot = new AccelRectangle();
 		dot.width = playerTexture.getWidth();
 		dot.height = playerTexture.getHeight();
@@ -209,5 +241,6 @@ public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 		dot.y = MathUtils.random(dot.height, camera.viewportHeight - dot.height);
 		dots.add(dot);
 		lastDotTime = TimeUtils.nanoTime();
+		dotCount += 1;
 	}
 }

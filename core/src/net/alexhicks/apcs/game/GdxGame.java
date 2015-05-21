@@ -43,6 +43,8 @@ public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 	public Array<Float[]> trail;
 	private int dotCount = 0;
 	private GlyphLayout glyph;
+	public boolean isPaused = false;
+	private int pauseTimer = 0;
 	
 	@Override
 	public void create() {
@@ -98,12 +100,18 @@ public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 				font.draw(batch, "Vertical: " + player.verticalAcceleration, 30, 90);
 				font.draw(batch, "Horizontal: " + player.horizontalAcceleration, 30, 120);
 			}
+			if (isPaused) {
+				font.draw(batch, "Paused.", 30, 150);
+			}
 		}
 		batch.end();
 		if (isOver) {
 			updateOver();
 		} else {
-			update();
+			updatePause();
+			if (!isPaused) {
+				update();
+			}
 			checkBoundaries();
 		}
 	}
@@ -124,6 +132,16 @@ public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 			trail = new Array<Float[]>();
 			dotCount = 0;
 			startTime = TimeUtils.millis();
+		}
+	}
+	
+	private void updatePause() {
+		pauseTimer++;
+		if (pauseTimer > 50) {
+			if (Gdx.input.isKeyPressed(Keys.SPACE)) {
+				isPaused = !isPaused;
+				pauseTimer = 0;
+			}
 		}
 	}
 
@@ -230,6 +248,7 @@ public class GdxGame extends ApplicationAdapter implements ApplicationListener {
 		isOver = true;
 		endTime = TimeUtils.millis();
 		highScore = saveHighScore();
+		pauseTimer = 0;
 	}
 
 	private void spawnDot() {

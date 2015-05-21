@@ -1,7 +1,7 @@
 # DOT
 This is my AP Computer Science A final project.
 
-![Screenshot](https://docs.google.com/file/d/0BxNajUy3bd8_SUZOWS1TX29YQWs/edit?usp=drivesdk)
+![Screenshot](https://raw.githubusercontent.com/Tiin57/apcs-final/master/screenshots/2015-05-21_09-28-28.png)
 
 WASD or the arrow keys to move.
 

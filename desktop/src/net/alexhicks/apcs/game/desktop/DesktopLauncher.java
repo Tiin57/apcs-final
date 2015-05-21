@@ -10,7 +10,7 @@ public class DesktopLauncher {
 
 	public static void main(String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.title = "D.O.T. - Defendable Oblique Trinomial Version " + GdxGame.VERSION;
+		config.title = GdxGame.TITLE;
 		config.width = 800;
 		config.height = 480;
 		LwjglApplication app = new LwjglApplication(new GdxGame(), config);
